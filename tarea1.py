@@ -17,6 +17,7 @@ def main():
     # Remover valores inválidos
     clean_csvdata = np.sort(csvdata[np.logical_not(np.isnan(csvdata))])
     length = len(clean_csvdata)
+    print("Cantidad de datos válidos: {}".format(length))
 
     # Mediana
     if length%2 == 0:
@@ -56,18 +57,28 @@ def main():
     print("Medidas de variabilidad:\n\tVarianza: {}\n\tDesviación Estandar: {}\n\tCoeficiente de variación: {}%\n\tRango muestral: {}\n\tRIC: {}\n".format(variance, deviation, var_coefficient*100, sample_range, RIC))
 
 
-    # Box plot
+    # Diagrama de cajas
+    lim_inferior = q1-1.5*RIC
+    lim_superior = q3+1.5*RIC
+    valid_data = clean_csvdata[np.where((clean_csvdata >= lim_inferior) & (clean_csvdata <= lim_superior))]
+    max_adentro = valid_data.max()
+    min_adentro = valid_data.min()
+    atypic_data = clean_csvdata[np.where((clean_csvdata < lim_inferior) | (clean_csvdata > lim_superior))]
 
-    #print("Análisis de cajas:")
-    #fig, ax = plt.subplots()
+    print("Datos diagrama de cajas:\n\tLímite inferior: {}\n\tLímite superior: {}\n\tBigote inferior: {}\n\tBigote superior: {}\n\tCantidad de puntos atípicos: {}\n".format(lim_inferior, lim_superior, min_adentro, max_adentro, len(atypic_data)))
 
-    #ax.boxplot(clean_csvdata,
-    #        vert=False)
 
-    #ax.set_title('basic plot')
+    fig_box, ax_box = plt.subplots()
 
-    
-    #plt.show()
+    ax_box.boxplot(clean_csvdata,
+            vert=False)
+
+    ax_box.set_title('Diagrama de cajas')
+    ax_box.set_xlabel('lws')
+    ax_box.set_yticks([])
+
+    fig_box.savefig("diagrama_cajas.svg")
     
 if __name__ == "__main__":
     main()
+    plt.show()
